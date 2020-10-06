@@ -11,14 +11,13 @@ var urlsToCache = [
   "/pages/materialize.html",
   "/pages/semantic-ui.html",
   "/css/materialize.min.css",
-  "/css/materialize.css",
   "/js/materialize.min.js",
-  "/js/materialize.js",
   "/js/nav.js",
   "/assets/Bootstrap.svg",
   "/assets/bulma-logo.png",
   "/assets/materialize.svg",
   "/assets/semantic-ui.png",
+  "/assets/menu-white-18dp.svg",
 ];
 
 self.addEventListener("install", function (event) {
