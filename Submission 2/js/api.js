@@ -1,5 +1,3 @@
-var base_url = "https://private-044be-dicodingfootball.apiary-mock.com";
-
 // Blok kode yang akan di panggil jika fetch berhasil
 function status(response) {
   if (response.status !== 200) {
@@ -24,15 +22,19 @@ function error(error) {
 }
 
 function getTeams(league) {
-  fetch(base_url + "/api/v1/json/1/search_all_teams.php?l=" + league)
+  fetch(`https://api.football-data.org/v2/competitions/${league}/teams`, {
+    headers: {
+      "X-Auth-Key": "3c95e145608a431f82cf8a3ac6f119ad",
+    },
+  })
     .then(status)
     .then(json)
     .then((data) => {
       let teamsHTML = "";
       data.teams.forEach((team) => {
         teamsHTML += `
-            <a class="carousel-item" href="./detail.html?id=${team.idTeam}">
-            <img src="${team.strTeamBadge}"/>
+            <a class="carousel-item" href="./detail.html?id=${team.id}">
+            <img src="${team.crestUrl}"/>
             </a>
             `;
       });

@@ -29,9 +29,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (this.status == 200) {
           content.innerHTML = xhttp.responseText;
           if (page === "premier-league") {
-            getTeams("English Premier League");
+            getTeams("PL");
           } else if (page === "serie-a") {
-            getTeams("Italian Serie A");
+            getTeams("SA");
           }
         } else if (this.status == 404) {
           content.innerHTML = "<p>Halaman tidak ditemukan.</p>";
