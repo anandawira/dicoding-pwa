@@ -161,7 +161,7 @@ function getSavedArticles() {
                 `;
     });
     // Sisipkan komponen card ke dalam elemen dengan id #content
-    document.getElementById("body-content").innerHTML = articlesHTML;
+    document.getElementById("articles").innerHTML = articlesHTML;
   });
 }
 
@@ -184,5 +184,19 @@ function getSavedArticleById() {
   `;
     // Sisipkan komponen card ke dalam elemen dengan id #content
     document.getElementById("body-content").innerHTML = articleHTML;
+  });
+}
+
+function getById(id) {
+  return new Promise(function (resolve, reject) {
+    dbPromised
+      .then(function (db) {
+        var tx = db.transaction("articles", "readonly");
+        var store = tx.objectStore("articles");
+        return store.get(id);
+      })
+      .then(function (article) {
+        resolve(article);
+      });
   });
 }
