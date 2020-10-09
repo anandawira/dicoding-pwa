@@ -23,8 +23,9 @@ function error(error) {
 
 function getTeams(league) {
   fetch(`https://api.football-data.org/v2/competitions/${league}/teams`, {
+    method: "GET",
     headers: {
-      "X-Auth-Key": "3c95e145608a431f82cf8a3ac6f119ad",
+      "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
     },
   })
     .then(status)
@@ -40,6 +41,42 @@ function getTeams(league) {
       });
       document.getElementById("teams-carousel").innerHTML = teamsHTML;
       initCarousel();
+    })
+    .catch(error);
+}
+
+function getTeamById(id) {
+  fetch(`https://api.football-data.org//v2/teams/${id}`, {
+    method: "GET",
+    headers: {
+      "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
+    },
+  })
+    .then(status)
+    .then(json)
+    .then((data) => {
+      let teamHTML = `
+      <img src="${data.crestUrl}" alt="club-logo" />
+      <h1>${data.name}</h1>
+      <h5>Player List:</h5>
+      <ul>`;
+
+      data.squad.forEach((squad) => {
+        if (squad.role == "PLAYER") {
+          teamHTML += `
+          <li>${squad.name} (${squad.position})</li>`;
+        } else if (squad.role == "COACH") {
+          teamHTML += `
+          <li>${squad.name} (Coach)</li>`;
+        }
+      });
+
+      teamHTML += `
+      </ul>`;
+
+      document.getElementById("body-content").innerHTML = teamHTML;
+
+      resolve(data);
     })
     .catch(error);
 }
