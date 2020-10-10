@@ -74,7 +74,6 @@ function getTeamById(id) {
         .then(function (response) {
           if (response) {
             response.json().then(function (data) {
-              
               let teamHTML = `
               <img src="${data.crestUrl}" alt="club-logo" />
               <h1>${data.name}</h1>
