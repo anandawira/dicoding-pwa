@@ -32,6 +32,8 @@ document.addEventListener("DOMContentLoaded", function () {
             getTeams("PL");
           } else if (page === "serie-a") {
             getTeams("SA");
+          } else if (page === "saved-teams") {
+            getSavedTeams();
           }
         } else if (this.status == 404) {
           content.innerHTML = "<p>Halaman tidak ditemukan.</p>";

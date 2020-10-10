@@ -28,20 +28,42 @@
     <!-- FAB -->
     <div class="fixed-action-btn">
       <a class="btn-floating btn-large red" id="save">
-        <i class="large material-icons">save</i>
+        <i id="fab-icon" class="large material-icons"></i>
       </a>
     </div>
     <!-- Akhir FAB -->
 
     <script src="./js/materialize.min.js"></script>
+    <script src="./js/idb.js"></script>
+    <script src="./js/db.js"></script>
     <script src="./js/api.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const urlParams = new URLSearchParams(window.location.search);
         const teamId = urlParams.get("id");
-        getTeamById(teamId);
-        var btnSave = document.getElementById("save");
-        b
+        const isSaved = urlParams.get("saved");
+
+        const btnSave = document.getElementById("save");
+        const fabIcon = document.getElementById("fab-icon");
+
+        btnSave.setAttribute("href", "./index.html#saved-teams");
+
+        if (isSaved) {
+          getSavedTeamById();
+          fabIcon.innerText = "clear";
+
+          btnSave.onclick = () => {
+            console.log("FAB clicked");
+            deleteTeam(teamId);
+          };
+        } else {
+          const item = getTeamById(teamId);
+          fabIcon.innerText = "save";
+          btnSave.onclick = () => {
+            console.log("FAB clicked");
+            item.then((team) => saveForLater(team));
+          };
+        }
       });
     </script>
   </body>

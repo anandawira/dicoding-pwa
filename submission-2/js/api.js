@@ -46,45 +46,100 @@ function getTeams(league) {
 }
 
 function getTeamById(id) {
-  fetch(`https://api.football-data.org//v2/teams/${id}`, {
-    method: "GET",
-    headers: {
-      "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
-    },
-  })
-    .then(status)
-    .then(json)
-    .then((data) => {
-      let teamHTML = `
-      <img src="${data.crestUrl}" alt="club-logo" />
-      <h1>${data.name}</h1>
-      <h5>Player List:</h5>
-      <ul>`;
-
-      data.squad.forEach((squad) => {
-        if (squad.role == "PLAYER") {
-          teamHTML += `
-          <li>${squad.name} (${squad.position})</li>`;
-        } else if (squad.role == "COACH") {
-          teamHTML += `
-          <li>${squad.name} (Coach)</li>`;
-        }
-      });
-
-      teamHTML += `
-      </ul>`;
-
-      document.getElementById("body-content").innerHTML = teamHTML;
-
-      resolve(data);
+  return new Promise((resolve, reject) => {
+    fetch(`https://api.football-data.org//v2/teams/${id}`, {
+      method: "GET",
+      headers: {
+        "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
+      },
     })
-    .catch(error);
+      .then(status)
+      .then(json)
+      .then((data) => {
+        let teamHTML = `
+        <img src="${data.crestUrl}" alt="club-logo" />
+        <h1>${data.name}</h1>
+        <h5>Player List:</h5>
+        <ul>`;
+
+        data.squad.forEach((squad) => {
+          if (squad.role == "PLAYER") {
+            teamHTML += `
+            <li>${squad.name} (${squad.position})</li>`;
+          } else if (squad.role == "COACH") {
+            teamHTML += `
+            <li>${squad.name} (Coach)</li>`;
+          }
+        });
+
+        teamHTML += `
+        </ul>`;
+
+        document.getElementById("body-content").innerHTML = teamHTML;
+
+        resolve(data);
+      })
+      .catch(error);
+  });
+}
+
+function getSavedTeams() {
+  getAll().then((teams) => {
+    console.log(teams);
+
+    let teamsHTML = "";
+
+    if (teams.length === 0) {
+      console.log("sadas");
+      document.getElementById("title").innerText = "No Saved Teams";
+    }
+
+    teams.forEach((team) => {
+      teamsHTML += `
+            <a class="carousel-item" href="./detail.html?id=${team.id}&saved=true">
+            <img src="${team.crestUrl}"/>
+            </a>
+            `;
+    });
+
+    document.getElementById("teams-carousel").innerHTML = teamsHTML;
+    initCarousel();
+  });
+}
+
+function getSavedTeamById() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var idParam = urlParams.get("id");
+
+  getById(idParam).then((data) => {
+    let teamHTML = `
+        <img src="${data.crestUrl}" alt="club-logo" />
+        <h1>${data.name}</h1>
+        <h5>Player List:</h5>
+        <ul>`;
+
+    data.squad.forEach((squad) => {
+      if (squad.role == "PLAYER") {
+        teamHTML += `
+            <li>${squad.name} (${squad.position})</li>`;
+      } else if (squad.role == "COACH") {
+        teamHTML += `
+            <li>${squad.name} (Coach)</li>`;
+      }
+    });
+
+    teamHTML += `
+        </ul>`;
+
+    document.getElementById("body-content").innerHTML = teamHTML;
+  });
 }
 
 function initCarousel() {
   const options = {
-    dist: -80,
+    dist: -100,
     numVisible: 7,
+    noWrap: true,
   };
   var elems = document.querySelectorAll(".carousel");
   var instances = M.Carousel.init(elems, options);
