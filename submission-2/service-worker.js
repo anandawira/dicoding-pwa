@@ -25,6 +25,7 @@ self.addEventListener("install", function (event) {
 
 self.addEventListener("fetch", function (event) {
   var base_url = "https://api.football-data.org";
+  const img_url = "https://crests.football-data.org";
   if (event.request.url.indexOf(base_url) > -1) {
     event.respondWith(
       caches.open(CACHE_NAME).then(function (cache) {
@@ -34,6 +35,23 @@ self.addEventListener("fetch", function (event) {
             "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
           },
         }).then(function (response) {
+          cache.put(event.request.url, response.clone());
+          return response;
+        });
+      })
+    );
+  } else {
+    event.respondWith(
+      caches.match(event.request).then(function (response) {
+        return response || fetch(event.request);
+      })
+    );
+  }
+
+  if (event.request.url.indexOf(img_url) > -1) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(function (cache) {
+        return fetch(event.request).then(function (response) {
           cache.put(event.request.url, response.clone());
           return response;
         });

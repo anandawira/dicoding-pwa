@@ -26,6 +26,7 @@ function getTeams(league) {
     caches
       .match(`https://api.football-data.org/v2/competitions/${league}/teams`)
       .then(function (response) {
+        console.log("home", response);
         if (response) {
           response.json().then(function (data) {
             let teamsHTML = "";
@@ -39,39 +40,43 @@ function getTeams(league) {
             document.getElementById("teams-carousel").innerHTML = teamsHTML;
             initCarousel();
           });
+        } else {
+          fetch(
+            `https://api.football-data.org/v2/competitions/${league}/teams`,
+            {
+              method: "GET",
+              headers: {
+                "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
+              },
+            }
+          )
+            .then(status)
+            .then(json)
+            .then((data) => {
+              let teamsHTML = "";
+              data.teams.forEach((team) => {
+                teamsHTML += `
+                <a class="carousel-item" href="./detail.html?id=${team.id}">
+                <img src="${team.crestUrl}"/>
+                </a>
+                `;
+              });
+              document.getElementById("teams-carousel").innerHTML = teamsHTML;
+              initCarousel();
+            })
+            .catch(error);
         }
       });
   }
-
-  fetch(`https://api.football-data.org/v2/competitions/${league}/teams`, {
-    method: "GET",
-    headers: {
-      "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
-    },
-  })
-    .then(status)
-    .then(json)
-    .then((data) => {
-      let teamsHTML = "";
-      data.teams.forEach((team) => {
-        teamsHTML += `
-        <a class="carousel-item" href="./detail.html?id=${team.id}">
-        <img src="${team.crestUrl}"/>
-        </a>
-        `;
-      });
-      document.getElementById("teams-carousel").innerHTML = teamsHTML;
-      initCarousel();
-    })
-    .catch(error);
 }
 
 function getTeamById(id) {
   return new Promise((resolve, reject) => {
     if ("caches" in window) {
       caches
-        .match(`https://api.football-data.org//v2/teams/${id}`)
+        .match(`https://api.football-data.org/v2/teams/${id}`)
         .then(function (response) {
+          console.log("detail", response);
           if (response) {
             response.json().then(function (data) {
               let teamHTML = `
@@ -101,7 +106,7 @@ function getTeamById(id) {
         });
     }
 
-    fetch(`https://api.football-data.org//v2/teams/${id}`, {
+    fetch(`https://api.football-data.org/v2/teams/${id}`, {
       method: "GET",
       headers: {
         "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
