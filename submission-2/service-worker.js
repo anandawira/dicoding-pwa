@@ -26,7 +26,20 @@ self.addEventListener("install", function (event) {
 self.addEventListener("fetch", function (event) {
   var base_url = "https://api.football-data.org";
   const img_url = "https://crests.football-data.org";
-  if (event.request.url.indexOf(base_url) > -1) {
+
+  //Save result from API Call
+
+  //Save loaded club logo
+  if (event.request.url.indexOf(img_url) > -1) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(function (cache) {
+        return fetch(event.request).then(function (response) {
+          cache.put(event.request.url, response.clone());
+          return response;
+        });
+      })
+    );
+  } else if (event.request.url.indexOf(base_url) > -1) {
     event.respondWith(
       caches.open(CACHE_NAME).then(function (cache) {
         return fetch(event.request, {
@@ -40,22 +53,15 @@ self.addEventListener("fetch", function (event) {
         });
       })
     );
-  } else {
+  } else if (
+    event.request.url.indexOf("http://localhost:5500/detail.html") > -1
+  ) {
     event.respondWith(
-      caches.match(event.request).then(function (response) {
-        return response || fetch(event.request);
-      })
-    );
-  }
-
-  if (event.request.url.indexOf(img_url) > -1) {
-    event.respondWith(
-      caches.open(CACHE_NAME).then(function (cache) {
-        return fetch(event.request).then(function (response) {
-          cache.put(event.request.url, response.clone());
-          return response;
-        });
-      })
+      caches
+        .match("http://localhost:5500/detail.html")
+        .then(function (response) {
+          return response || fetch(event.request);
+        })
     );
   } else {
     event.respondWith(
