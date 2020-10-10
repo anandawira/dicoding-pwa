@@ -13,6 +13,8 @@ var urlsToCache = [
   "/index.html",
   "/nav.html",
   "/",
+  "https://fonts.googleapis.com/icon?family=Material+Icons",
+  "https://fonts.gstatic.com/s/materialicons/v55/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2",
 ];
 
 self.addEventListener("install", function (event) {
@@ -32,10 +34,15 @@ self.addEventListener("fetch", function (event) {
   //Save loaded club logo
   if (event.request.url.indexOf(img_url) > -1) {
     event.respondWith(
-      caches.open(CACHE_NAME).then(function (cache) {
-        return fetch(event.request).then(function (response) {
-          cache.put(event.request.url, response.clone());
-          return response;
+      caches.open("CACHE_NAME").then(function (cache) {
+        return cache.match(event.request).then(function (response) {
+          var fetchPromise = fetch(event.request).then(function (
+            networkResponse
+          ) {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+          return response || fetchPromise;
         });
       })
     );
