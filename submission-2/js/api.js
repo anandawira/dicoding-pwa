@@ -22,6 +22,27 @@ function error(error) {
 }
 
 function getTeams(league) {
+  if ("caches" in window) {
+    caches
+      .match(`https://api.football-data.org/v2/competitions/${league}/teams`)
+      .then(function (response) {
+        if (response) {
+          response.json().then(function (data) {
+            let teamsHTML = "";
+            data.teams.forEach((team) => {
+              teamsHTML += `
+              <a class="carousel-item" href="./detail.html?id=${team.id}">
+              <img src="${team.crestUrl}"/>
+              </a>
+              `;
+            });
+            document.getElementById("teams-carousel").innerHTML = teamsHTML;
+            initCarousel();
+          });
+        }
+      });
+  }
+
   fetch(`https://api.football-data.org/v2/competitions/${league}/teams`, {
     method: "GET",
     headers: {
@@ -34,10 +55,10 @@ function getTeams(league) {
       let teamsHTML = "";
       data.teams.forEach((team) => {
         teamsHTML += `
-            <a class="carousel-item" href="./detail.html?id=${team.id}">
-            <img src="${team.crestUrl}"/>
-            </a>
-            `;
+        <a class="carousel-item" href="./detail.html?id=${team.id}">
+        <img src="${team.crestUrl}"/>
+        </a>
+        `;
       });
       document.getElementById("teams-carousel").innerHTML = teamsHTML;
       initCarousel();
@@ -47,6 +68,40 @@ function getTeams(league) {
 
 function getTeamById(id) {
   return new Promise((resolve, reject) => {
+    if ("caches" in window) {
+      caches
+        .match(`https://api.football-data.org//v2/teams/${id}`)
+        .then(function (response) {
+          if (response) {
+            response.json().then(function (data) {
+              
+              let teamHTML = `
+              <img src="${data.crestUrl}" alt="club-logo" />
+              <h1>${data.name}</h1>
+              <h5>Player List:</h5>
+              <ul>`;
+
+              data.squad.forEach((squad) => {
+                if (squad.role == "PLAYER") {
+                  teamHTML += `
+                   <li>${squad.name} (${squad.position})</li>`;
+                } else if (squad.role == "COACH") {
+                  teamHTML += `
+                  <li>${squad.name} (Coach)</li>`;
+                }
+              });
+
+              teamHTML += `
+              </ul>`;
+
+              document.getElementById("body-content").innerHTML = teamHTML;
+
+              resolve(data);
+            });
+          }
+        });
+    }
+
     fetch(`https://api.football-data.org//v2/teams/${id}`, {
       method: "GET",
       headers: {
@@ -137,7 +192,7 @@ function getSavedTeamById() {
 
 function initCarousel() {
   const options = {
-    dist: -100,
+    dist: -50,
     numVisible: 7,
     noWrap: true,
   };
