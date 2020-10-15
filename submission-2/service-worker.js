@@ -31,8 +31,6 @@ self.addEventListener("fetch", function (event) {
   var base_url = "https://api.football-data.org";
   const img_url = "https://crests.football-data.org";
 
-  //Save result from API Call
-
   //Save loaded club logo
   if (event.request.url.indexOf(img_url) > -1) {
     event.respondWith(
