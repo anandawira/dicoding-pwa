@@ -13,11 +13,11 @@ webPush.setVapidDetails(
 );
 var pushSubscription = {
   endpoint:
-    "https://fcm.googleapis.com/fcm/send/dgcX9PxLoEI:APA91bFaDG91sFLYQctDdmpdyqqMXFjKB99fen0CIdkrMb6luzb9leN6PRFtUuDlmKVRWgwsauN4tSeAu2JhTxpqKaXNUJIcYSuwpI_x4zIcJPgYycF1nvbRnWWUPdtfEKwnSXXxaO2z",
+    "https://updates.push.services.mozilla.com/wpush/v2/gAAAAABfh…B0Rl6FR7V8AjVQbW83RW_dvYiqmdZXm7Gl-Vjmg02bl-kKgtaXyf7OLyT4hE",
   keys: {
     p256dh:
-      "BL/9sHScRDedSA/TJszppkLzCEgy+HJz4UlIPsWocRIhHXL79cNSlAGCnSN1YmBGoAnQbEN4y/BDJawIIqIImUw=",
-    auth: "35AxK/Y4QJ10TEbRkWrnCg==",
+      "BN2nmUIXSFH5+hhYK/fkyAGEo6QzNa8u47vKZ1SC7nUZBCj73LAqHXgPwJYE3STuRCv5Nbr5v3VRclEnE+zKEGs=",
+    auth: "JfBXLP7QRcUYXGB/WCLMOw==",
   },
 };
 var payload = "Selamat! Aplikasi Anda sudah dapat menerima push notifikasi!";

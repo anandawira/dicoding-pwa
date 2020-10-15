@@ -10,6 +10,8 @@ var urlsToCache = [
   "/pages/saved-teams.html",
   "/pages/serie-a.html",
   "/detail.html",
+  "/icon.png",
+  "/manifest.json",
   "/index.html",
   "/nav.html",
   "/",
@@ -60,21 +62,13 @@ self.addEventListener("fetch", function (event) {
         });
       })
     );
-  } else if (
-    event.request.url.indexOf("http://localhost:5500/detail.html") > -1
-  ) {
+  } else {
     event.respondWith(
       caches
-        .match("http://localhost:5500/detail.html")
+        .match(event.request, { ignoreSearch: true })
         .then(function (response) {
           return response || fetch(event.request);
         })
-    );
-  } else {
-    event.respondWith(
-      caches.match(event.request).then(function (response) {
-        return response || fetch(event.request);
-      })
     );
   }
 });
