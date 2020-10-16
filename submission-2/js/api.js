@@ -22,126 +22,67 @@ function error(error) {
 }
 
 function getTeams(league) {
-  if ("caches" in window) {
-    caches
-      .match(`https://api.football-data.org/v2/competitions/${league}/teams`)
-      .then(function (response) {
-        console.log("home", response);
-        if (response) {
-          response.json().then(function (data) {
-            let teamsHTML = "";
-            data.teams.forEach((team) => {
-              teamsHTML += `
-              <a class="carousel-item" href="./detail.html?id=${team.id}">
-              <img src="${team.crestUrl}"/>
-              </a>
-              `;
-            });
-            document.getElementById("teams-carousel").innerHTML = teamsHTML;
-            initCarousel();
-          });
-        } else {
-          fetch(
-            `https://api.football-data.org/v2/competitions/${league}/teams`,
-            {
-              method: "GET",
-              headers: {
-                "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
-              },
-            }
-          )
-            .then(status)
-            .then(json)
-            .then((data) => {
-              let teamsHTML = "";
-              data.teams.forEach((team) => {
-                teamsHTML += `
-                <a class="carousel-item" href="./detail.html?id=${team.id}">
-                <img src="${team.crestUrl}"/>
-                </a>
-                `;
-              });
-              document.getElementById("teams-carousel").innerHTML = teamsHTML;
-              initCarousel();
-            })
-            .catch(error);
-        }
+  fetch(`https://api.football-data.org/v2/competitions/${league}/teams`, {
+    method: "GET",
+    headers: {
+      "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
+    },
+  })
+    .then(status)
+    .then(json)
+    .then((data) => {
+      let teamsHTML = "";
+      data.teams.forEach((team) => {
+        teamsHTML += `
+        <a class="carousel-item" href="./detail.html?id=${team.id}">
+        <img src="${team.crestUrl}"/>
+        </a>
+        `;
       });
-  }
+      document.getElementById("teams-carousel").innerHTML = teamsHTML;
+      initCarousel();
+    })
+    .catch(error);
 }
 
 function getTeamById(id) {
   return new Promise((resolve, reject) => {
-    if ("caches" in window) {
-      caches
-        .match(`https://api.football-data.org/v2/teams/${id}`)
-        .then(function (response) {
-          console.log("detail", response);
-          if (response) {
-            response.json().then(function (data) {
-              let teamHTML = `
+    fetch(`https://api.football-data.org/v2/teams/${id}`, {
+      method: "GET",
+      headers: {
+        "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
+      },
+    })
+      .then(status)
+      .then(json)
+      .then((data) => {
+        let teamHTML = `
               <img src="${data.crestUrl}" alt="club-logo" />
               <h1>${data.name}</h1>
               <h5>Player List:</h5>
               <ul>`;
 
-              data.squad.forEach((squad) => {
-                if (squad.role == "PLAYER") {
-                  teamHTML += `
-                   <li>${squad.name} (${squad.position})</li>`;
-                } else if (squad.role == "COACH") {
-                  teamHTML += `
-                  <li>${squad.name} (Coach)</li>`;
-                }
-              });
-
-              teamHTML += `
-              </ul>`;
-
-              document.getElementById("body-content").innerHTML = teamHTML;
-
-              resolve(data);
-            });
-          } else {
-            fetch(`https://api.football-data.org/v2/teams/${id}`, {
-              method: "GET",
-              headers: {
-                "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
-              },
-            })
-              .then(status)
-              .then(json)
-              .then((data) => {
-                let teamHTML = `
-              <img src="${data.crestUrl}" alt="club-logo" />
-              <h1>${data.name}</h1>
-              <h5>Player List:</h5>
-              <ul>`;
-
-                data.squad.forEach((squad) => {
-                  if (squad.role == "PLAYER") {
-                    teamHTML += `
+        data.squad.forEach((squad) => {
+          if (squad.role == "PLAYER") {
+            teamHTML += `
                     <li>${squad.name} (${squad.position})</li>`;
-                  } else if (squad.role == "COACH") {
-                    teamHTML += `
+          } else if (squad.role == "COACH") {
+            teamHTML += `
                     <li>${squad.name} (Coach)</li>`;
-                  }
-                });
-
-                teamHTML += `
-                </ul>`;
-
-                document.getElementById("body-content").innerHTML = teamHTML;
-
-                resolve(data);
-              })
-              .catch(() => {
-                document.getElementById("body-content").innerHTML =
-                  "<h1>Halaman tidak dapat ditampilkan.</h1>";
-              });
           }
         });
-    }
+
+        teamHTML += `
+                </ul>`;
+
+        document.getElementById("body-content").innerHTML = teamHTML;
+
+        resolve(data);
+      })
+      .catch(() => {
+        document.getElementById("body-content").innerHTML =
+          "<h1>Halaman tidak dapat ditampilkan.</h1>";
+      });
   });
 }
 

@@ -1,75 +1,76 @@
-const CACHE_NAME = "football-teams";
-var urlsToCache = [
-  "/css/materialize.min.css",
-  "/js/api.js",
-  "/js/db.js",
-  "/js/idb.js",
-  "/js/materialize.min.js",
-  "/js/nav.js",
-  "/pages/premier-league.html",
-  "/pages/saved-teams.html",
-  "/pages/serie-a.html",
-  "/detail.html",
-  "/icon.png",
-  "/manifest.json",
-  "/index.html",
-  "/nav.html",
-  "/",
-  "https://fonts.googleapis.com/icon?family=Material+Icons",
-  "https://fonts.gstatic.com/s/materialicons/v55/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2",
-];
+importScripts(
+  "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js"
+);
 
-self.addEventListener("install", function (event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(function (cache) {
-      return cache.addAll(urlsToCache);
-    })
-  );
-});
+if (workbox) {
+  console.log("Workbox terpasang");
+} else {
+  console.log(`Workbox tidak terpasang`);
+}
 
-self.addEventListener("fetch", function (event) {
-  var base_url = "https://api.football-data.org";
-  const img_url = "https://crests.football-data.org";
-
-  //Save loaded club logo
-  if (event.request.url.indexOf(img_url) > -1) {
-    event.respondWith(
-      caches.open("CACHE_NAME").then(function (cache) {
-        return cache.match(event.request).then(function (response) {
-          var fetchPromise = fetch(event.request).then(function (
-            networkResponse
-          ) {
-            cache.put(event.request, networkResponse.clone());
-            return networkResponse;
-          });
-          return response || fetchPromise;
-        });
-      })
-    );
-  } else if (event.request.url.indexOf(base_url) > -1) {
-    event.respondWith(
-      caches.open(CACHE_NAME).then(function (cache) {
-        return fetch(event.request, {
-          method: "GET",
-          headers: {
-            "X-Auth-Token": "3c95e145608a431f82cf8a3ac6f119ad",
-          },
-        }).then(function (response) {
-          cache.put(event.request.url, response.clone());
-          return response;
-        });
-      })
-    );
-  } else {
-    event.respondWith(
-      caches
-        .match(event.request, { ignoreSearch: true })
-        .then(function (response) {
-          return response || fetch(event.request);
-        })
-    );
+// Precaching
+workbox.precaching.precacheAndRoute(
+  [
+    "/css/materialize.min.css",
+    "/js/api.js",
+    "/js/db.js",
+    "/js/idb.js",
+    "/js/materialize.min.js",
+    "/js/nav.js",
+    "/pages/premier-league.html",
+    "/pages/saved-teams.html",
+    "/pages/serie-a.html",
+    "/detail.html",
+    "/icon.png",
+    "/manifest.json",
+    "/index.html",
+    "/nav.html",
+    "/",
+  ],
+  {
+    // Ignore all URL parameters.
+    ignoreUrlParametersMatching: [/.*/],
   }
-});
+);
+
+// Menyimpan cache dari CSS Google Fonts
+workbox.routing.registerRoute(
+  /^https:\/\/fonts\.googleapis\.com/,
+  workbox.strategies.staleWhileRevalidate({
+    cacheName: "google-fonts-stylesheets",
+  })
+);
+
+// Menyimpan cache untuk file font selama 1 tahun
+workbox.routing.registerRoute(
+  /^https:\/\/fonts\.gstatic\.com/,
+  workbox.strategies.cacheFirst({
+    cacheName: "google-fonts-webfonts",
+    plugins: [
+      new workbox.cacheableResponse.Plugin({
+        statuses: [0, 200],
+      }),
+      new workbox.expiration.Plugin({
+        maxAgeSeconds: 60 * 60 * 24 * 365,
+        maxEntries: 30,
+      }),
+    ],
+  })
+);
+
+// Runtime caching api call
+workbox.routing.registerRoute(
+  /^https:\/\/api\.football-data\.org/,
+  workbox.strategies.staleWhileRevalidate()
+);
+
+// Runtime caching club logo
+workbox.routing.registerRoute(
+  /^https:\/\/crests\.football-data\.org/,
+  workbox.strategies.staleWhileRevalidate({
+    cacheName: "club-logo",
+  })
+);
 
 self.addEventListener("push", function (event) {
   var body;
